@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 
 namespace roboforce::driver {
 RS485Controller::RS485Controller(const std::string& port_name,
@@ -96,20 +97,60 @@ bool RS485Controller::writeAndRead(
       std::cout << "[DEBUG] Writing " << command.size() << " bytes to serial port..." << std::endl;
     }
 
-    // Commented out actual serial write
+    // Write command to serial port
     serial_port_->Write(command);
     serial_port_->DrainWriteBuffer();
 
+    // Add small delay to allow device to process command and prepare response
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
     if (debug_mode_) {
       std::cout << "[DEBUG] Write complete. Attempting to read " << status_frame_size_ << " bytes from serial port (timeout: " << RS485_TIMEOUT << "s)..." << std::endl;
+      
+      // Check if there's data available to read
+      if (serial_port_->IsDataAvailable()) {
+        std::cout << "[DEBUG] Data is available for reading" << std::endl;
+      } else {
+        std::cout << "[DEBUG] No data immediately available, will wait for timeout..." << std::endl;
+      }
     }
 
     // Pre-size response buffer to expected frame size
-    response.resize(status_frame_size_);
+    response.clear();
+    response.reserve(status_frame_size_);
 
-    // Commented out actual serial read
     auto start_time = std::chrono::steady_clock::now();
-    serial_port_->Read(response, status_frame_size_, RS485_TIMEOUT * 1000);
+    
+    // Try to read the complete frame with timeout
+    try {
+      std::vector<uint8_t> temp_buffer(status_frame_size_);
+      size_t bytes_read = serial_port_->Read(temp_buffer, status_frame_size_, RS485_TIMEOUT * 1000);
+      
+      if (bytes_read > 0) {
+        temp_buffer.resize(bytes_read);
+        response = temp_buffer;
+      }
+    } catch (const std::exception& read_exception) {
+      if (debug_mode_) {
+        std::cout << "[DEBUG] Read exception: " << read_exception.what() << std::endl;
+      }
+      // Try reading byte by byte if bulk read fails
+      response.clear();
+      for (size_t i = 0; i < status_frame_size_; ++i) {
+        try {
+          char byte;
+          size_t read_count = serial_port_->Read(byte, 100); // 100ms timeout per byte
+          if (read_count == 1) {
+            response.push_back(static_cast<uint8_t>(byte));
+          } else {
+            break; // Timeout on this byte
+          }
+        } catch (...) {
+          break; // Exception on this byte
+        }
+      }
+    }
+    
     auto end_time = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 
@@ -118,6 +159,21 @@ bool RS485Controller::writeAndRead(
       std::cout << "[DEBUG] Read " << response.size() << " bytes from serial port (expected " << status_frame_size_ << ")" << std::endl;
       if (response.size() != status_frame_size_) {
         std::cout << "[DEBUG] WARNING: Incomplete read! Got " << response.size() << " bytes, expected " << status_frame_size_ << std::endl;
+      }
+      
+      // Print what we actually received
+      if (response.size() > 0) {
+        std::cout << "[DEBUG] Raw response data: ";
+        for (size_t i = 0; i < response.size(); i++) {
+          std::cout << std::hex << std::setw(2) << std::setfill('0')
+                    << static_cast<int>(response[i]);
+          if (i < response.size() - 1) {
+            std::cout << " ";
+          }
+        }
+        std::cout << std::dec << std::endl;
+      } else {
+        std::cout << "[DEBUG] No response data received" << std::endl;
       }
     }
 

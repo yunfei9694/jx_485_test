@@ -20,7 +20,7 @@ static constexpr float CHASSIS_MIN_VELOCITY_RAW =
     -2000;                                            // mm/s and 0.001 rad/s
 static constexpr float LIFT_MAX_VELOCITY_RAW = 300;   // 0.01 m/s
 static constexpr float LIFT_MIN_VELOCITY_RAW = -300;  // 0.01 m/s
-static constexpr int RS485_TIMEOUT = 1;
+static constexpr int RS485_TIMEOUT = 5;  // Increased timeout to 5 seconds
 
 // RS485 format
 static constexpr auto CHARACTER_SIZE = LibSerial::CharacterSize::CHAR_SIZE_8;
