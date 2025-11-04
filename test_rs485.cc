@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 
         // Set all velocities to zero
         std::cout << "Setting chassis velocity to (0, 0, 0)..." << std::endl;
-        if (!controller->setChassisVelocity(10.0f, 0.0f, 0.0f)) {
+        if (!controller->setChassisVelocity(100.0f, 0.0f, 0.0f)) {
             std::cerr << "Failed to set chassis velocity" << std::endl;
         }
 
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
         // Wait for response to be received and processed
         std::cout << "Waiting for response..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         // Print status
         printStatus(controller);
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
 
             // Send command to get updated status
             controller->sendCommand();
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             std::cout << "Status update #" << (i + 1) << ":" << std::endl;
             printStatus(controller);

@@ -70,8 +70,8 @@ struct FrameAddressBase {
 // command/status specific dataframe
 struct CommandAddress : FrameAddressBase {
   static constexpr uint8_t SUSPENSION = 11;
-  static constexpr uint8_t CRC_LOW = 12;
-  static constexpr uint8_t CRC_HIGH = 13;
+  static constexpr uint8_t CRC_LOW = 13;
+  static constexpr uint8_t CRC_HIGH = 12;
 };
 
 struct StatusAddressBase : FrameAddressBase {
