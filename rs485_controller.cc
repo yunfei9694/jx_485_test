@@ -124,10 +124,10 @@ bool RS485Controller::writeAndRead(
     // Try to read the complete frame with timeout
     try {
       std::vector<uint8_t> temp_buffer(status_frame_size_);
-      size_t bytes_read = serial_port_->Read(temp_buffer, status_frame_size_, RS485_TIMEOUT * 1000);
+      serial_port_->Read(temp_buffer, status_frame_size_, RS485_TIMEOUT * 1000);
       
-      if (bytes_read > 0) {
-        temp_buffer.resize(bytes_read);
+      // The Read function modifies the buffer size to reflect actual bytes read
+      if (temp_buffer.size() > 0) {
         response = temp_buffer;
       }
     } catch (const std::exception& read_exception) {
@@ -138,10 +138,10 @@ bool RS485Controller::writeAndRead(
       response.clear();
       for (size_t i = 0; i < status_frame_size_; ++i) {
         try {
-          char byte;
-          size_t read_count = serial_port_->Read(byte, 100); // 100ms timeout per byte
-          if (read_count == 1) {
-            response.push_back(static_cast<uint8_t>(byte));
+          std::vector<uint8_t> single_byte(1);
+          serial_port_->Read(single_byte, 1, 100); // 100ms timeout per byte
+          if (single_byte.size() == 1) {
+            response.push_back(single_byte[0]);
           } else {
             break; // Timeout on this byte
           }
