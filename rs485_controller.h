@@ -7,6 +7,7 @@
 
 #include <libserial/SerialPort.h>
 
+#include <algorithm>
 #include <atomic>
 #include <map>
 #include <mutex>

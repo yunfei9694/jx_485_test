@@ -142,6 +142,8 @@ int main(int argc, char** argv) {
 
         // Print status
         printStatus(controller);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        printStatus(controller);
 
         // Keep running and printing status every 2 seconds
         std::cout << "Monitoring status (press Ctrl+C to exit)..." << std::endl;

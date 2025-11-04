@@ -134,21 +134,6 @@ bool RS485Controller::writeAndRead(
       if (debug_mode_) {
         std::cout << "[DEBUG] Read exception: " << read_exception.what() << std::endl;
       }
-      // Try reading byte by byte if bulk read fails
-      response.clear();
-      for (size_t i = 0; i < status_frame_size_; ++i) {
-        try {
-          std::vector<uint8_t> single_byte(1);
-          serial_port_->Read(single_byte, 1, 100); // 100ms timeout per byte
-          if (single_byte.size() == 1) {
-            response.push_back(single_byte[0]);
-          } else {
-            break; // Timeout on this byte
-          }
-        } catch (...) {
-          break; // Exception on this byte
-        }
-      }
     }
     
     auto end_time = std::chrono::steady_clock::now();
@@ -274,7 +259,9 @@ std::vector<uint8_t> RS485Controller::rs485Thread() {
         {
           // std::lock_guard<std::mutex> lock(status_mutex_);
           deserializeStatus(response);
-          return response;
+          if (debug_mode_) {
+            std::cout << "[DEBUG] Status updated successfully" << std::endl;
+          }
         }
       } else {
         if (debug_mode_) {
