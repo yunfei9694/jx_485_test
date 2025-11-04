@@ -234,7 +234,7 @@ std::vector<uint8_t> RS485Controller::rs485Thread() {
     std::vector<uint8_t> command = command_opt.value();
     std::vector<uint8_t> response;
 
-    // Send command and read response
+    // Send command and read 
     if (writeAndRead(command, response)) {
       // Print response hex even before validation
       if (debug_mode_) {

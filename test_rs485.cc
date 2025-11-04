@@ -136,23 +136,23 @@ int main(int argc, char** argv) {
             std::cerr << "Failed to send command" << std::endl;
         }
 
-        // Wait for response to be received and processed
+        // Wait briefly for response to be received and processed
         std::cout << "Waiting for response..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::microseconds(100));  // Reduced to 100 microseconds
 
         // Print status
         printStatus(controller);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Reduced to 100ms for faster updates
         printStatus(controller);
 
-        // Keep running and printing status every 2 seconds
+        // Keep running and printing status every 50ms for more real-time updates
         std::cout << "Monitoring status (press Ctrl+C to exit)..." << std::endl;
-        for (int i = 0; i < 10; i++) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+        for (int i = 0; i < 200; i++) {  // Increased iterations for same total duration
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));  // More frequent updates
 
             // Send command to get updated status
             controller->sendCommand();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
 
             std::cout << "Status update #" << (i + 1) << ":" << std::endl;
             printStatus(controller);

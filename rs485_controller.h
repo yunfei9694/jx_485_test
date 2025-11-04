@@ -218,8 +218,8 @@ class RS485Controller {
   std::thread rs485_thread_;
   std::atomic<bool> thread_running_;
 
-  static constexpr size_t QUEUE_SIZE = 100;
-  static constexpr int QUEUE_TIMEOUT_MS = 200;
+  static constexpr size_t QUEUE_SIZE = 1000;  // Increased queue size
+  static constexpr int QUEUE_TIMEOUT_MS = 50;   // Reduced timeout for faster response
 
   // Command queue: Thread 0 -> Thread 1
   SyncQueue<std::vector<uint8_t>> command_queue_{QUEUE_SIZE};
