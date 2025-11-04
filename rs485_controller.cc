@@ -257,7 +257,7 @@ std::vector<uint8_t> RS485Controller::rs485Thread() {
 
         // Deserialize and update internal status
         {
-          // std::lock_guard<std::mutex> lock(status_mutex_);
+          std::lock_guard<std::mutex> lock(status_mutex_);
           deserializeStatus(response);
           if (debug_mode_) {
             std::cout << "[DEBUG] Status updated successfully" << std::endl;
@@ -457,7 +457,7 @@ bool RS485ControllerV25::deserializeStatus(const std::vector<uint8_t>& buffer) {
 bool RS485ControllerV25::getChassisVelocity(float& linear_x, float& linear_y,
                                             float& angular_z) {
   // Convert from protocol units: mm/s -> m/s, mrad/s -> rad/s
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
   linear_x = static_cast<float>(status_payload_.chassis_vx) / 1000.0f;
   linear_y = static_cast<float>(status_payload_.chassis_vy) / 1000.0f;
   angular_z = static_cast<float>(status_payload_.chassis_vz) / 1000.0f;
@@ -466,7 +466,7 @@ bool RS485ControllerV25::getChassisVelocity(float& linear_x, float& linear_y,
 }
 
 bool RS485ControllerV25::getLiftVelocity(float& lift_velocity) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
 
   // Convert from protocol units: mm/s -> m/s
   lift_velocity = static_cast<float>(status_payload_.lift_speed) / 1000.0f;
@@ -482,7 +482,7 @@ bool RS485ControllerV25::getLiftPosition(float& lift_position) {
 }
 
 bool RS485ControllerV25::getBatteryLevel(int& battery) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
   battery = static_cast<int>(status_payload_.battery_level);
   return true;
 }
@@ -560,7 +560,7 @@ bool RS485ControllerV30::deserializeStatus(const std::vector<uint8_t>& buffer) {
 
 bool RS485ControllerV30::getChassisVelocity(float& linear_x, float& linear_y,
                                             float& angular_z) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
 
   linear_x = static_cast<float>(status_payload_.chassis_vx) / 1000.0f;
   linear_y = static_cast<float>(status_payload_.chassis_vy) / 1000.0f;
@@ -570,21 +570,21 @@ bool RS485ControllerV30::getChassisVelocity(float& linear_x, float& linear_y,
 }
 
 bool RS485ControllerV30::getLiftVelocity(float& lift_velocity) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
 
   lift_velocity = static_cast<float>(status_payload_.lift_speed) / 1000.0f;
   return true;
 }
 
 bool RS485ControllerV30::getLiftPosition(float& lift_position) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
 
   lift_position = static_cast<float>(status_payload_.lift_position) / 1000.0f;
   return true;
 }
 
 bool RS485ControllerV30::getBatteryLevel(int& battery) {
-  // std::lock_guard<std::mutex> lock(status_mutex_);
+  std::lock_guard<std::mutex> lock(status_mutex_);
   battery = static_cast<int>(status_payload_.battery_level);
   return true;
 }
